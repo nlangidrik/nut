@@ -1,0 +1,11 @@
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.3
+Flask-Bcrypt==1.0.1
+pynut3==2.2.1
+paramiko==3.3.1
+requests==2.31.0
+python-dotenv==1.0.0
+gunicorn==21.2.0
+Werkzeug==2.3.7 

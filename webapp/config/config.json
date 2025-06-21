@@ -1,0 +1,17 @@
+{
+  "nut_server": {
+    "host": "localhost",
+    "port": 3493,
+    "ups_name": "ups"
+  },
+  "alerts": {
+    "battery_low_threshold": 20,
+    "runtime_low_threshold": 5,
+    "power_failure_delay": 60
+  },
+  "shutdown": {
+    "auto_shutdown_enabled": true,
+    "battery_threshold": 15,
+    "runtime_threshold": 10
+  }
+} 

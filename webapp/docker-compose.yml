@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - ups-monitor
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    environment:
+      - FLASK_ENV=production
+      - NUT_SERVER_HOST=${NUT_SERVER_HOST:-localhost}
+      - NUT_SERVER_PORT=${NUT_SERVER_PORT:-3493}
+      - UPS_NAME=${UPS_NAME:-ups}
+    networks:
+      - ups-monitor
+    restart: unless-stopped
+
+networks:
+  ups-monitor:
+    driver: bridge
+
+volumes:
+  config:
+  logs: 
