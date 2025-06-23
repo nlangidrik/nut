@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4">
             <div className="flex items-center">
-              <Zap className="h-8 w-8 text-primary-600" />
+              <img src="/mipss-logo.png" alt="Logo" className="h-7 w-7 mr-2 rounded-full" />
               <span className="ml-2 text-xl font-semibold text-gray-900">UPS Monitor</span>
             </div>
             <button
@@ -88,7 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex h-16 items-center px-4">
-            <Zap className="h-8 w-8 text-primary-600" />
+            <img src="/mipss-logo.png" alt="Logo" className="h-7 w-7 mr-2 rounded-full" />
             <span className="ml-2 text-xl font-semibold text-gray-900">UPS Monitor</span>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
@@ -135,7 +135,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </button>
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex items-center">
-              <Zap className="h-8 w-8 text-primary-600" />
+              <img src="/mipss-logo.png" alt="Logo" className="h-7 w-7 mr-2 rounded-full" />
               <span className="ml-2 text-xl font-semibold text-gray-900">UPS Monitor</span>
             </div>
           </div>

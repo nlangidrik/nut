@@ -24,19 +24,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <img src="/mipss-logo.png" alt="Marshall Islands Public School System Logo" className="w-24 h-24 mb-6 rounded-full shadow" />
+      <h1 className="text-4xl font-bold mb-2">UPS Monitor</h1>
+      <p className="text-gray-500 mb-8">Sign in to access your UPS monitoring dashboard</p>
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-            <Zap className="h-6 w-6 text-primary-600" />
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            UPS Monitor
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access your UPS monitoring dashboard
-          </p>
-        </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
