@@ -8,7 +8,10 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  LayoutDashboard,
+  Computer,
+  ScrollText
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -23,6 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Monitor },
     { name: 'Devices', href: '/devices', icon: Server },
+    { name: 'System Logs', href: '/logs', icon: ScrollText },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

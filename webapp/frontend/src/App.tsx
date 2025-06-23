@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import Devices from './components/Devices';
 import Settings from './components/Settings';
 import Layout from './components/Layout';
+import SystemLogs from './components/SystemLogs';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -36,6 +37,16 @@ const App: React.FC = () => {
                 <PrivateRoute>
                   <Layout>
                     <Devices />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/logs"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <SystemLogs />
                   </Layout>
                 </PrivateRoute>
               }
