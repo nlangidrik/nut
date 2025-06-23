@@ -1,7 +1,17 @@
 import React from 'react';
 import { CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
-const logs = [
+// Explicitly type the log level
+type LogLevel = 'success' | 'warning' | 'info';
+
+interface LogEntry {
+  level: LogLevel;
+  message: string;
+  time: string;
+  icon: React.ReactNode;
+}
+
+const logs: LogEntry[] = [
   {
     level: 'success',
     message: 'Main Server UPS: Power restored',
@@ -22,7 +32,7 @@ const logs = [
   },
 ];
 
-const levelStyles = {
+const levelStyles: Record<LogLevel, string> = {
   success: 'bg-green-50 border-green-200',
   warning: 'bg-yellow-50 border-yellow-200',
   info: 'bg-blue-50 border-blue-200',
