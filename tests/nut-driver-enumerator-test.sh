@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# Copyright (C) 2018 Eaton
+# Copyright (C)
+#   2018       Eaton
+#   2020-2025  Jim Klimov <jimklimov+nut@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,15 +32,24 @@ LC_ALL=C
 TZ=UTC
 export LANG LC_ALL TZ
 
+# tools
+[ -n "${GREP}" ] || { GREP="`command -v grep`" && [ x"${GREP}" != x ] || { echo "$0: FAILED to locate GREP tool" >&2 ; exit 1 ; } ; export GREP ; }
+[ -n "${EGREP}" ] || { if ( [ x"`echo a | $GREP -E '(a|b)'`" = xa ] ) 2>/dev/null ; then EGREP="$GREP -E" ; else EGREP="`command -v egrep`" ; fi && [ x"${EGREP}" != x ] || { echo "$0: FAILED to locate EGREP tool" >&2 ; exit 1 ; } ; export EGREP ; }
+
 ### Note: These are relative to where the selftest script lives,
 ### not the NUT top_srcdir etc. They can be exported by a Makefile.
-[ -n "${BUILDDIR-}" ] || BUILDDIR="`dirname $0`"
-[ -n "${SRCDIR-}" ] || SRCDIR="`dirname $0`"
+[ -n "${BUILDDIR-}" ] || BUILDDIR="`dirname \"$0\"`"
+[ -n "${SRCDIR-}" ] || SRCDIR="`dirname \"$0\"`"
 [ -n "${SHELL_PROGS-}" ] || SHELL_PROGS="/bin/sh"
 case "${DEBUG-}" in
     [Yy]|[Yy][Ee][Ss]) DEBUG=yes ;;
     [Tt][Rr][Aa][Cc][Ee]) DEBUG=trace ;;
     *) DEBUG="" ;;
+esac
+case "${FAILFAST-}" in
+    [Yy]|[Yy][Ee][Ss]|[Tt][Rr][Uu][Ee]) FAILFAST=true ;;
+    [Nn]|[Nn][Oo]|[Ff][Aa][Ll][Ss][Ee]) FAILFAST=false ;;
+    *) FAILFAST=false ;;
 esac
 
 SYSTEMD_CONFPATH="${BUILDDIR}/selftest-rw/systemd-units"
@@ -64,28 +75,46 @@ fi
 
 FAIL_COUNT=0
 GOOD_COUNT=0
-callNDE() {
+callSHELL() {
+    # Calls shell as-is, pass the script name (or stdin) to execute some logic
     case "$DEBUG" in
-        yes)   time $USE_SHELL $NDE "$@" ;;
-        trace) time $USE_SHELL -x $NDE "$@" ;;
-        *)     $USE_SHELL $NDE "$@" 2>/dev/null ;;
+        yes)   time $USE_SHELL "$@" ;;
+        trace) time $USE_SHELL -x "$@" ;;
+        *)     $USE_SHELL "$@" 2>/dev/null ;;
     esac
 }
 
-run_testcase() {
-    # First 3 args are required as defined below; the rest are
+callNDE() {
+    callSHELL $NDE "$@"
+}
+
+callG2V() (
+    # Test case runner may want to pass NUT_VERSION_QUERY, NUT_VERSION_FORCED etc.
+    # Collect debug output line into stdout too
+    export NUT_VERSION_QUERY
+    export NUT_VERSION_FORCED
+    export NUT_VERSION_EXTRA_WIDTH
+    export BASE
+    export TRUNK
+
+    $USE_SHELL "${SRCDIR}/../tools/gitlog2version.sh" 2>&1
+)
+
+run_testcase_generic() {
+    # First 4 args are required as defined below; the rest are
     # CLI arg(s) to nut-driver-enumerator.sh
-    CASE_DESCR="$1"
-    EXPECT_CODE="$2"
-    EXPECT_TEXT="$3"
-    shift 3
+    CASE_CMD="$1"
+    CASE_DESCR="$2"
+    EXPECT_CODE="$3"	# Can be '*' to ignore errors
+    EXPECT_TEXT="$4"
+    shift 4
 
     printf "Testing : SHELL='%s'\tCASE='%s'\t" "$USE_SHELL" "$CASE_DESCR"
-    OUT="`callNDE "$@"`" ; RESCODE=$?
+    OUT="`$CASE_CMD \"$@\"`" ; RESCODE=$?
     printf "Got : RESCODE='%s'\t" "$RESCODE"
 
     RES=0
-    if [ "$RESCODE" = "$EXPECT_CODE" ]; then
+    if [ "$RESCODE" = "$EXPECT_CODE" ] || [ x'*' = x"$EXPECT_CODE" ]; then
         printf "STATUS_CODE='MATCHED'\t"
         GOOD_COUNT="`expr $GOOD_COUNT + 1`"
     else
@@ -104,13 +133,32 @@ run_testcase() {
         ( rm -f "/tmp/.nde.text.expected.$$" "/tmp/.nde.text.actual.$$" \
             && echo "$EXPECT_TEXT" > "/tmp/.nde.text.expected.$$" \
             && echo "$OUT" > "/tmp/.nde.text.actual.$$" \
-            && diff -u "/tmp/.nde.text.expected.$$" "/tmp/.nde.text.actual.$$" ) 2>/dev/null || true
+            && { OUTD="`diff -u \"/tmp/.nde.text.expected.$$\" \"/tmp/.nde.text.actual.$$\" 2>/dev/null`"
+                if echo "$OUTD" | head -1 | ${EGREP} '^[-+]' >/dev/null ; then
+                    echo "$OUTD"
+                else
+                    diff "/tmp/.nde.text.expected.$$" "/tmp/.nde.text.actual.$$"
+                fi
+            } ; ) 2>/dev/null || true
         rm -f "/tmp/.nde.text.expected.$$" "/tmp/.nde.text.actual.$$"
-        FAIL_COUNT="`expr $FAIL_COUNT + 1`"
-        RES="`expr $RES + 2`"
+        if [ x'*' = x"$EXPECT_CODE" ] ; then
+            echo 'MISMATCH IGNORED because EXPECT_CODE=*' >&2
+        else
+            FAIL_COUNT="`expr $FAIL_COUNT + 1`"
+            RES="`expr $RES + 2`"
+        fi
     fi
     if [ "$RES" != 0 ] || [ -n "$DEBUG" ] ; then echo "" ; fi
+    if [ "$RES" != 0 ] && $FAILFAST ; then
+        echo "FAILFAST: abort after test case failure" >&2
+        exit $RES
+    fi
     return $RES
+}
+
+run_testcase() {
+    # Main call for NDE test suites:
+    run_testcase_generic callNDE "$@"
 }
 
 ##################################################################
@@ -288,6 +336,154 @@ globalflag" \
         --show-config-value '' nosuchflag
 }
 
+# This one is not about NDE as such, but piggy-backs on our ability to test
+# multiple shells at once, with a test relevant for how we write scripts
+# (with backticks to remain compatible with older Bourne-like shells).
+# In particular, we have a problem with KSH on Solaris, treating double
+# quotes inside backticked text which is wrapped in more double quotes
+# (so some command execution would be a single token) as an end of a
+# double-quoted token and so abortion of a command mid-way; other shells
+# were not seen to work this way:
+testcase_backticks_cmd_natural() {
+    #DEBUG=yes \
+    callSHELL << 'EOF'
+    nut_with_python=yes; nut_with_python2=no; nut_with_python3=auto-prio=3; PYTHON=python; PYTHON2=auto-py; PYTHON3=python3
+    RES=0
+    FOUND_PYTHONS="`( echo "${nut_with_python}|${PYTHON}"; echo "${nut_with_python2}|${PYTHON2}"; echo "${nut_with_python3}|${PYTHON3}" ) | ${EGREP} -v '\|\(no\)*$' | ${EGREP} -v '^no\|'`" || RES=$?
+    echo "${FOUND_PYTHONS}"
+    exit $RES
+EOF
+}
+
+testcase_backticks_cmd_escaped() {
+    callSHELL << 'EOF'
+    nut_with_python=yes; nut_with_python2=no; nut_with_python3=auto-prio=3; PYTHON=python; PYTHON2=auto-py; PYTHON3=python3
+    RES=0
+    # Escape the quotes, following examples at
+    # https://stackoverflow.com/a/33301370/4715872
+    FOUND_PYTHONS="`( echo \"${nut_with_python}|${PYTHON}\"; echo \"${nut_with_python2}|${PYTHON2}\"; echo \"${nut_with_python3}|${PYTHON3}\" ) | ${EGREP} -v '\|\(no\)*$' | ${EGREP} -v '^no\|'`" || RES=$?
+    echo "${FOUND_PYTHONS}"
+    exit $RES
+EOF
+}
+
+testcase_backticks() {
+    run_testcase_generic testcase_backticks_cmd_natural \
+        "Backticks wrapped in doublequotes, with doublequoted text inside (can fail on some interpreters)" '*' \
+"yes|python
+auto-prio=3|python3"
+
+    run_testcase_generic testcase_backticks_cmd_escaped \
+        "Backticks wrapped in doublequotes, with escaped-doublequoted text inside" 0 \
+"yes|python
+auto-prio=3|python3"
+}
+
+# Make sure our weird version parsing works with different shell interpreters
+# (and related toolkits like sed, printf, grep, awk, tr, etc.)
+testcase_gitlog2version() {
+    # A couple of version tests below are almost directly taken
+    # from what the script returns in a git workspace, to compare
+    # that it parses the same values in (legacy) mode for fixed
+    # strings, such as dist tarball or for version comparisons.
+    # Note that TRUNK and BASE are normally unknown when running
+    # as a script for legacy version mode (and currently ignored
+    # even if passed by caller like below). Also note that for
+    # an RC, the SEMVER is "+1 from last tag" (by design), and
+    # that the "vX.Y.Z+rcN" tail of the SUFFIX and extra numbers
+    # (that are not in preceding-release tag) are not parts of
+    # the `git describe`-aligned DESC value (the RC tag is added
+    # to SUFFIX by script, when running in the git workspace)
+
+    # Taken from `git checkout v2.8.4-rc3` (emptied TRUNK and BASE):
+    NUT_VERSION_FORCED=2.8.3.786-786+gadfdbe3ab+v2.8.4+rc3 \
+    TRUNK='origin/master' BASE='adfdbe3aba19e157010075c42fba7c3174e9baa7' \
+    run_testcase_generic callG2V \
+        "Testing that parsing from a NUT_VERSION_FORCED string for a known git checkout returns same results, for a release candidate" 0 \
+"SEMVER=2.8.4; TRUNK=''; BASE=''; DESC='v2.8.3-786+gadfdbe3ab' => TAG='v2.8.3' + SUFFIX='-786+gadfdbe3ab+v2.8.4+rc3' => VER5='2.8.3.786.0' => DESC5='2.8.3.786.0-786+gadfdbe3ab+v2.8.4+rc3' => VER50='2.8.3.786' => DESC50='2.8.3.786-786+gadfdbe3ab+v2.8.4+rc3'
+2.8.3.786-786+gadfdbe3ab+v2.8.4+rc3"
+
+    # Taken from `git checkout v2.8.4` (emptied TRUNK and BASE):
+    NUT_VERSION_FORCED=2.8.4 \
+    TRUNK='origin/master' BASE='541c2ecf0b2ec33dadb9f40b16acbe39042bd103' \
+    run_testcase_generic callG2V \
+        "Testing that parsing from a NUT_VERSION_FORCED string for a known git checkout returns same results, for a release (tag)" 0 \
+"SEMVER=2.8.4; TRUNK=''; BASE=''; DESC='v2.8.4' => TAG='v2.8.4' + SUFFIX='' => VER5='2.8.4.0.0' => DESC5='2.8.4.0.0' => VER50='2.8.4' => DESC50='2.8.4'
+2.8.4"
+
+    NUT_VERSION_QUERY=DESC5X \
+    NUT_VERSION_FORCED=3.14.159.2653.59-2712+gdeadbeef+v3.14.160+rc1 \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, for a release candidate, with extra fields" 0 \
+"SEMVER=3.14.160; TRUNK=''; BASE=''; DESC='v3.14.159-2712+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-2712+gdeadbeef+v3.14.160+rc1' => VER5='3.14.159.2653.59' => DESC5='3.14.159.2653.59-2712+gdeadbeef+v3.14.160+rc1' => VER50='3.14.159.2653.59' => DESC50='3.14.159.2653.59-2712+gdeadbeef+v3.14.160+rc1'
+000003.000014.000159.002653.000059-2712+gdeadbeef+v3.14.160+rc1"
+
+    NUT_VERSION_QUERY=VER5X \
+    NUT_VERSION_FORCED=3.14.159.2653.59-2712+gdeadbeef+v3.14.160+rc1 \
+    NUT_VERSION_EXTRA_WIDTH=9 \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, for a release candidate, just the numeric part" 0 \
+"SEMVER=3.14.160; TRUNK=''; BASE=''; DESC='v3.14.159-2712+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-2712+gdeadbeef+v3.14.160+rc1' => VER5='3.14.159.2653.59' => DESC5='3.14.159.2653.59-2712+gdeadbeef+v3.14.160+rc1' => VER50='3.14.159.2653.59' => DESC50='3.14.159.2653.59-2712+gdeadbeef+v3.14.160+rc1'
+000000003.000000014.000000159.000002653.000000059"
+
+    # Reset NUT_VERSION_EXTRA_WIDTH for ksh out there
+    NUT_VERSION_EXTRA_WIDTH='' \
+    NUT_VERSION_QUERY=DESC5X \
+    NUT_VERSION_FORCED=3.14.159.2653.59-2712+gdeadbeef \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, for a dev iteration, with extra fields" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159-2712+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-2712+gdeadbeef' => VER5='3.14.159.2653.59' => DESC5='3.14.159.2653.59-2712+gdeadbeef' => VER50='3.14.159.2653.59' => DESC50='3.14.159.2653.59-2712+gdeadbeef'
+000003.000014.000159.002653.000059-2712+gdeadbeef"
+
+    NUT_VERSION_QUERY=VER5X \
+    NUT_VERSION_FORCED=3.14.159.2653.59-2712+gdeadbeef \
+    NUT_VERSION_EXTRA_WIDTH=8 \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, for a dev iteration, just the numeric part, wider numbers" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159-2712+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-2712+gdeadbeef' => VER5='3.14.159.2653.59' => DESC5='3.14.159.2653.59-2712+gdeadbeef' => VER50='3.14.159.2653.59' => DESC50='3.14.159.2653.59-2712+gdeadbeef'
+00000003.00000014.00000159.00002653.00000059"
+
+    # Reset NUT_VERSION_EXTRA_WIDTH for ksh out there
+    NUT_VERSION_EXTRA_WIDTH='' \
+    NUT_VERSION_QUERY=VER5X \
+    NUT_VERSION_FORCED=3.14.159.2653 \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, for a master merge increment, just the numeric part (requiring at least 5 numeric components)" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159' => TAG='v3.14.159' + SUFFIX='' => VER5='3.14.159.2653.0' => DESC5='3.14.159.2653.0' => VER50='3.14.159.2653' => DESC50='3.14.159.2653'
+000003.000014.000159.002653.000000"
+
+    NUT_VERSION_QUERY=VER50X \
+    NUT_VERSION_FORCED=3.14.159.2653 \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, for a master merge increment, just the numeric part (dropping trailing zero numeric components)" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159' => TAG='v3.14.159' + SUFFIX='' => VER5='3.14.159.2653.0' => DESC5='3.14.159.2653.0' => VER50='3.14.159.2653' => DESC50='3.14.159.2653'
+000003.000014.000159.002653"
+
+    # Note that DESC must be either a tag as is,
+    # or suffixed with commit count and git hash
+    # Reset NUT_VERSION_QUERY for ksh out there
+    NUT_VERSION_QUERY='' \
+    NUT_VERSION_FORCED=3.14.159+gdeadbeef \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, with a trailing gHASH but no commit count" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159-0+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-0+gdeadbeef' => VER5='3.14.159.0.0' => DESC5='3.14.159.0.0-0+gdeadbeef' => VER50='3.14.159' => DESC50='3.14.159-0+gdeadbeef'
+3.14.159-0+gdeadbeef"
+
+    # ...auto-account the offset since tag correctly:
+    NUT_VERSION_FORCED=3.14.159.2653+gdeadbeef \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, with a trailing gHASH but no commit count" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159-2653+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-2653+gdeadbeef' => VER5='3.14.159.2653.0' => DESC5='3.14.159.2653.0-2653+gdeadbeef' => VER50='3.14.159.2653' => DESC50='3.14.159.2653-2653+gdeadbeef'
+3.14.159.2653-2653+gdeadbeef"
+
+    # ...auto-account the offset since tag correctly
+    # (note two steps to add):
+    NUT_VERSION_FORCED=3.14.159.2653.5+gdeadbeef \
+    run_testcase_generic callG2V \
+        "Complex (forced) NUT version expanded for alphanumeric comparisons, with a trailing gHASH but no commit count" 0 \
+"SEMVER=3.14.159; TRUNK=''; BASE=''; DESC='v3.14.159-2658+gdeadbeef' => TAG='v3.14.159' + SUFFIX='-2658+gdeadbeef' => VER5='3.14.159.2653.5' => DESC5='3.14.159.2653.5-2658+gdeadbeef' => VER50='3.14.159.2653.5' => DESC50='3.14.159.2653.5-2658+gdeadbeef'
+3.14.159.2653.5-2658+gdeadbeef"
+}
 
 # Combine the cases above into a stack
 testsuite() {
@@ -298,6 +494,9 @@ testsuite() {
     testcase_globalSection
     # This one can take a while, put it last
     testcase_upslist_debug
+    # Something very different
+    testcase_backticks
+    testcase_gitlog2version
 }
 
 # If no args...
@@ -311,4 +510,26 @@ done
 
 echo "Test suite for nut-driver-enumerator has completed with $FAIL_COUNT failed cases and $GOOD_COUNT good cases" >&2
 
-[ "$FAIL_COUNT" = 0 ] || { echo "As a developer, you may want to export DEBUG=trace or export DEBUG=yes and re-run the test; also make sure you meant the nut-driver-enumerator.sh implementation as NDE='$NDE'" >&2 ; exit 1; }
+[ "$FAIL_COUNT" = 0 ] || {
+    echo "As a developer, you may want to export DEBUG=trace or export DEBUG=yes and re-run the test; also make sure you meant the nut-driver-enumerator.sh implementation as NDE='$NDE'"
+    for USE_SHELL in $SHELL_PROGS ; do
+        case "$USE_SHELL" in
+            */*) test -x "`echo $USE_SHELL | awk '{print $1}'`" ;;
+            busybox|busybox_sh|"busybox sh") command -v busybox ;;
+            *) command -v $USE_SHELL ;;
+        esac || echo "WARNING: Could not resolve shell interpreter '$USE_SHELL' in PATH='$PATH'"
+
+        case "$USE_SHELL" in
+            */sh|sh)
+                echo "WARNING: This test was executed with a system default shell interpreter '$USE_SHELL'; depends on implementation whether it supports the (legacy) POSIX syntax our scripts are written for or not" ;;
+            */ksh*|ksh*|*/ast-ksh*|ast-ksh*|*/oksh*|oksh*)
+                echo "INFO: We have reports that shell interpreter '$USE_SHELL' should support the (legacy) POSIX syntax our scripts are written for, but beware double-quotes inside and outside backticks" ;;
+            busybox|busybox_sh|"busybox sh"|*/busybox|*/bash|bash|*/dash|dash)
+                echo "INFO: We have reports that shell interpreter '$USE_SHELL' should support the (legacy) POSIX syntax our scripts are written for" ;;
+            */zsh|zsh|*/csh|*/tcsh)
+                echo "WARNING: Sadly, we have reports that shell interpreter '$USE_SHELL' does not support the (legacy) POSIX syntax our scripts are written for" ;;
+            *)  echo "WARNING: We do not have confirmation whether shell interpreter '$USE_SHELL' supports the (legacy) POSIX syntax our scripts are written for or not" ;;
+        esac
+    done
+    exit 1
+} >&2

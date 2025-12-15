@@ -7,14 +7,14 @@
 
 #set -x
 
-SCRIPTDIR="`dirname "$0"`"
-SCRIPTDIR="`cd "$SCRIPTDIR" && pwd`"
+SCRIPTDIR="`dirname \"$0\"`"
+SCRIPTDIR="`cd \"$SCRIPTDIR\" && pwd`"
 
 DLLLDD_SOURCED=true . "${SCRIPTDIR}/dllldd.sh"
 
 # This should match the tarball and directory name,
 # if a stable version is used:
-[ -n "$VER_OPT" ] || VER_OPT=2.8.3
+[ -n "$VER_OPT" ] || VER_OPT=2.8.4
 DEBUG=true
 
 # default to 32bits build
@@ -69,7 +69,7 @@ case "$SOURCEMODE" in
 stable)
 # FIXME
 # Stable version (download the latest stable archive)
-	VER_OPT_SHORT="`echo "$VER_OPT" | awk -F. '{print $1"."$2}'`"
+	VER_OPT_SHORT="`echo \"$VER_OPT\" | awk -F. '{print $1\".\"$2}'`"
 	if [ ! -s "nut-$VER_OPT.tar.gz" ] ; then
 		wget "https://www.networkupstools.org/source/$VER_OPT_SHORT/nut-$VER_OPT.tar.gz"
 	fi
@@ -209,10 +209,10 @@ do_build_mingw_nut() {
 		(cd "$INSTALL_DIR" && { dllldddir . | while read D ; do cp -pf "$D" ./bin/ ; done ; } ) || true
 
 		# Hardlink libraries for sbin (alternative: all bins in one dir):
-		(cd "$INSTALL_DIR/sbin" && { DESTDIR="$INSTALL_DIR" dllldddir . | while read D ; do ln -f ../bin/"`basename "$D"`" ./ ; done ; } ) || true
+		(cd "$INSTALL_DIR/sbin" && { DESTDIR="$INSTALL_DIR" dllldddir . | while read D ; do ln -f ../bin/"`basename \"$D\"`" ./ ; done ; } ) || true
 
 		# Hardlink libraries for cgi-bin if present:
-		(cd "$INSTALL_DIR/cgi-bin" 2>/dev/null && { DESTDIR="$INSTALL_DIR" dllldddir . | while read D ; do ln -f ../bin/"`basename "$D"`" ./ ; done ; } ) \
+		(cd "$INSTALL_DIR/cgi-bin" 2>/dev/null && { DESTDIR="$INSTALL_DIR" dllldddir . | while read D ; do ln -f ../bin/"`basename \"$D\"`" ./ ; done ; } ) \
 		|| echo "NOTE: FAILED to process OPTIONAL cgi-bin directory; was NUT CGI enabled?" >&2
 	fi
 

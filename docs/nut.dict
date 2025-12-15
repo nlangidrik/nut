@@ -1,4 +1,4 @@
-personal_ws-1.1 en 3522 utf-8
+personal_ws-1.1 en 3595 utf-8
 AAC
 AAS
 ABI
@@ -55,6 +55,7 @@ Alexey
 AllowOverride
 Alm
 Amplon
+AnchorJS
 Andreas
 Andreassen
 Andrzej
@@ -80,6 +81,7 @@ Autobook
 Autoconfigure
 Avocent
 Axel
+Axpert
 Axxium
 BATGNn
 BATNn
@@ -92,6 +94,8 @@ BCD
 BCHARGE
 BCM
 BD
+BKnnnnM
+BKxxxM
 BMC
 BNT
 BOH
@@ -102,6 +106,7 @@ BTEST
 BTS
 BTV
 BUFRD
+BUILTIN
 BUZ
 BVKnnnnM
 BVKxxxM
@@ -144,6 +149,7 @@ Breiland
 Brownell
 Bs
 BuildBot
+BuildRequires
 Buildbot
 Bxx
 ByPass
@@ -193,6 +199,7 @@ CSN
 CSS
 CTB
 CUDA
+CUSPP
 CVE
 CXR
 CXX
@@ -258,6 +265,7 @@ DEXP
 DF
 DHEA
 DIGYS
+DIRNAME
 DISCHRG
 DLDIR
 DLLs
@@ -435,6 +443,7 @@ GPLv
 GPSER
 GRs
 GTK
+GTS
 GUESSTIMATION
 GUID
 GUIs
@@ -499,11 +508,13 @@ HWMON
 Hajduch
 Hanno
 Harnhammar
+Hasangarayev
 Havard
 Heavner
 Hessenflow
 HiBox
 Hirschler
+Hite
 Hlavinka
 Holger
 Homebrew
@@ -686,6 +697,7 @@ MBATTCHG
 MBR
 MCU
 MDigest
+MEANWELL
 MEC
 MERCHANTABILITY
 MF
@@ -804,6 +816,8 @@ NOTOVER
 NOTTRIM
 NQA
 NTP
+NTU
+NTU's
 NUT's
 NUTCI
 NUTCONF
@@ -829,6 +843,7 @@ Neus
 Niels
 Niklas
 Niro
+NixOS
 Nobreak
 Nobreaks
 Nom
@@ -1003,6 +1018,7 @@ PowerWare
 Powerchute
 Powercool
 Powervar
+Powervar's
 Powerwell
 Prachi
 Prereqs
@@ -1286,6 +1302,7 @@ SystemIO
 Systeme
 Syu
 Szady
+TAE
 TBD
 TBR
 TCIFLUSH
@@ -1310,6 +1327,7 @@ TSR
 TST
 TT
 TTT
+TUD
 TXF
 TXG
 TXV
@@ -1395,10 +1413,12 @@ UUUU
 UX
 Ubuntu
 Ulf
+Ulfat
 Uncomment
 Unices
 Unitek
 Upsonic
+Upstreamed
 Ut
 V'ger
 VALIGN
@@ -1531,6 +1551,7 @@ additionalSOLibSearchPath
 addons
 addr
 addrange
+addvar
 addvars
 adelsystem
 adkorte
@@ -1544,6 +1565,7 @@ ae
 aec
 af
 afeb
+ageing
 aggregator
 ai
 aix
@@ -1635,6 +1657,7 @@ avahi
 avr
 awd
 awk
+axpert
 b'some
 b'string
 bAlternateSetting
@@ -1691,6 +1714,7 @@ bmake
 bn
 bool
 boolean
+booleans
 bootable
 bootenv
 bootfs
@@ -1755,8 +1779,10 @@ cgi
 cgipath
 cgroup
 cgroupsv
+changelog
 chargetime
 charset
+checkprocnames
 checkruntime
 checksum
 checksums
@@ -1800,9 +1826,12 @@ command's
 commandlen
 committer
 comms
+compareprocnames
 compat
 compilerPath
 conf
+confargs
+confdir
 config
 configparser
 configs
@@ -1876,6 +1905,7 @@ datarootdir
 dataset
 datasets
 datasheet
+datasize
 datastale
 dblatex
 dcd
@@ -1922,11 +1952,13 @@ devscan
 dfl
 dhcp
 dialout
+difftime
 diffutils
 dir
 disassembly
 discardable
 disp
+disptesttime
 distcheck
 distclean
 distro
@@ -1947,6 +1979,7 @@ docinfo
 docs
 dod
 domxml
+doshutdown
 dotnet
 downloadable
 dpkg
@@ -2060,6 +2093,7 @@ fe
 featureReport
 fenton
 fentonups
+ffee
 fffdddxxx
 ffff
 fi
@@ -2095,6 +2129,7 @@ fuji
 func
 gamatronic
 gandi
+gc
 gcc
 gcpp
 gd
@@ -2117,12 +2152,16 @@ getDevicesVariableValues
 getTrackingResult
 getValue
 getVariable
+getaddrinfo
 getconf
 getent
 getenv
+gethostbyname
 getopt
+getproctag
 gettext
 gettextize
+getval
 getvar
 gh
 gif
@@ -2190,6 +2229,7 @@ href
 htaccess
 htm
 html
+htmlcgi
 htmlpath
 http
 httpd
@@ -2249,6 +2289,7 @@ initctl
 initializer
 initializers
 initinfo
+initrd
 initscripts
 inittime
 initups
@@ -2256,6 +2297,7 @@ inline
 inlined
 innotech
 innovart
+innovatae
 inode
 inplace
 installable
@@ -2477,6 +2519,7 @@ lz
 mA
 mDNS
 mS
+macOS
 macaddr
 macosx
 mailo
@@ -2495,6 +2538,7 @@ matcher
 maxconnfails
 maxd
 maxlength
+maxproc
 maxreport
 maxretry
 maxstartdelay
@@ -2508,6 +2552,7 @@ mcview
 md
 mdadm
 mdutil
+meanwell
 mecer
 megatec
 memset
@@ -2538,6 +2583,8 @@ mips
 mirrorlist
 mis
 misconfigured
+mk
+mkdb
 mkdir
 mkstr
 mmZ
@@ -2591,6 +2638,7 @@ nSHUTDOWNCMD
 nabcd
 nameserver
 namespace
+namespaces
 nano
 nanosleep
 nashkaminski
@@ -2669,6 +2717,8 @@ nss
 ntopAI
 ntopSS
 ntopW
+ntu
+nuf
 nuget
 num
 numOfBytesFromUPS
@@ -2716,6 +2766,7 @@ onwards
 ooce
 openSUSE
 opencollective
+openfiles
 openipmi
 openjdk
 openlog
@@ -2729,11 +2780,13 @@ optimizations
 optiups
 oq
 os
+osc
 ostream
 other's
 otheruser
 ouGDQn
 outliers
+overtemp
 ovmf
 pF
 pacman
@@ -2763,6 +2816,7 @@ peername
 pem
 perc
 perl
+permalinks
 pfSense
 pfexec
 pfy
@@ -2812,11 +2866,13 @@ powermand
 powermust
 powernet
 poweroff
+powerp
 powerpal
 powerpanel
 powershell
 powerup
 powervalue
+powervar
 powerware
 ppc
 pprint
@@ -2835,16 +2891,20 @@ prereqs
 pretentiousVariableNamingSchemes
 prgshut
 printf
+prio
 priv
 privPassword
 privProtocol
+prjconf
 problemMatcher
 probu
 proc
 productid
 prog
 progname
+prognames
 progs
+promille
 proxied
 prtconf
 ps
@@ -2855,6 +2915,8 @@ pts
 ptv
 pty
 pulizzi
+purelib
+pv
 pw
 pwd
 pwmib
@@ -2907,6 +2969,7 @@ regtype
 relatime
 releasekeyring
 relicensing
+reloadable
 relogtime
 remoteip
 renderer
@@ -3004,7 +3067,9 @@ sendline
 sendmail
 sendsignal
 sendsignalfn
+sendsignalfnaliases
 sendsignalpid
+sendsignalpidaliases
 senoidal
 sequentialized
 ser
@@ -3015,9 +3080,11 @@ servicebypass
 setFeature
 setaux
 setflags
+setfsd
 setgid
 setinfo
 setpci
+setproctag
 setq
 setuid
 setupCommands
@@ -3049,6 +3116,7 @@ ske
 skel
 sl
 slackpkg
+slaveaddr
 slaveid
 slavesync
 slibtool
@@ -3069,6 +3137,7 @@ sockdebug
 socketname
 sockfn
 socomec
+soh
 solari
 solaris
 solcmn
@@ -3100,6 +3169,7 @@ sshd
 ssize
 ssl
 sstate
+stacksize
 stan
 startIP
 startdelay
@@ -3210,6 +3280,7 @@ termios
 testime
 testtime
 testuser
+testvar
 textproc
 tgcware
 tgt
@@ -3284,6 +3355,8 @@ uid
 uint
 ukUNV
 ul
+ulimit
+ulink
 un
 uname
 uncomment

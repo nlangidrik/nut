@@ -36,6 +36,10 @@
 # to HTML with ROWSPAN magic.  They must be an exact match for this to work.
 #
 # The entry may be followed by comments. Be sure to not use double-quotes there!
+#
+# Fields must be double-quoted (except for optional trailing comment) and
+# separated by a single TAB character. An empty field value is thus just
+# two double-quotes surreounded by TABs.
 
 "2E"	"ups"	"2"	"PS1000L"	"USB"	"nutdrv_qx"	# https://github.com/networkupstools/nut-ddl/issues/41
 "2E"	"ups"	"2"	"PS1000L"	"serial"	"nutdrv_qx"	# https://github.com/networkupstools/nut-ddl/issues/41
@@ -85,6 +89,7 @@
 "APC"	"ups"	"3"	"Back-UPS BF500"	"USB"	"usbhid-ups"
 "APC"	"ups"	"3"	"BACK-UPS XS LCD"	"USB"	"usbhid-ups"
 "APC"	"ups"	"3"	"Back-UPS XS 1000M (Back-UPS Pro 1000, Model BX1000M)"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/139
+"APC"	"ups"	"3"	"Back-UPS BK****M2-CH Series (may need tweaks since 2023)"	"USB"	"usbhid-ups lbrb_log_delay_sec=N lbrb_log_delay_without_calibrating onlinedischarge_calibration"	# https://github.com/networkupstools/nut/issues/3006
 "APC"	"ups"	"3"	"Back-UPS BX****MI Series (may need tweaks since 2023)"	"USB"	"usbhid-ups lbrb_log_delay_sec=N lbrb_log_delay_without_calibrating onlinedischarge_calibration"	# https://github.com/networkupstools/nut/issues/2347
 "APC"	"ups"	"3"	"Back-UPS BVK****M2 Series (may need tweaks)"	"USB"	"usbhid-ups lbrb_log_delay_sec=N lbrb_log_delay_without_calibrating onlinedischarge_calibration"	# https://github.com/networkupstools/nut/issues/2942
 "APC"	"ups"	"3"	"SMC2200BI-BR"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/557
@@ -214,6 +219,7 @@
 "Belkin"	"ups"	"2"	"Universal UPS F6C1100-UNV"	"USB (2007 models, vendor id: 0665)"	"blazer_usb"
 "Belkin"	"ups"	"3"	"Universal UPS F6C1200-UNV"	"USB (<= 2005 models, vendor id: 050d)"	"usbhid-ups"
 "Belkin"	"ups"	"2"	"Universal UPS F6C1200-UNV"	"USB (2007 models, vendor id: 0665)"	"blazer_usb"
+"Belkin"	"ups"	"2"	"Universal UPS F6C1200-UNV"	"USB (USB ID 0665:5161)"	"nutdrv_qx"
 "Belkin"	"ups"	"2"	"Universal UPS F6H350deUNV"	"serial port"	"blazer_ser"
 "Belkin"	"ups"	"2"	"Universal UPS F6H350ukUNV"	"serial port"	"blazer_ser"
 "Belkin"	"ups"	"2"	"Universal UPS F6H500ukUNV"	"serial port"	"blazer_ser"
@@ -628,6 +634,7 @@
 "Ippon"	"ups"	"2"	"Ampere 1000/1500/2000/3000 bl"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/2702
 "Ippon"	"ups"	"2"	"Innova RT 3/1 10K/10K compact/20K"	"USB"	"nutdrv_qx"	# https://github.com/networkupstools/nut/issues/2712
 "Ippon"	"ups"	"2"	"Innova RTB 1000/1500/2000/3000"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/2702
+"Ippon"	"ups"	"2"	"Innova TAE 1000"	"USB"	"nutdrv_qx (battery_voltage_reports_one_pack override.battery.packs=12)"	# https://github.com/networkupstools/nut/issues/3137
 "Ippon"	"ups"	"2"	"Innova TBE 1000/2000/3000"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/2702
 "Ippon"	"ups"	"2"	"Innova TB 1000/2000/3000"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/2702
 "Ippon"	"ups"	"2"	"Back Power Pro II 500/600/800"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/2702
@@ -665,7 +672,7 @@
 "Kanji"	"ups"	"1"	"800 VA"	"USB"	"nutdrv_atcl_usb"
 
 "Kebo"	"ups"	"2"	"1200D/D Series"	""	"blazer_ser"
-"Kebo"	"ups"	"2"	"UPS-1000D (UPS-1000VA)"	"USB"	"blazer_usb"	# https://github.com/networkupstools/nut/issues/981
+"Kebo"	"ups"	"2"	"UPS-1000D (UPS-1000VA)"	"USB"	"blazer_usb langid_fix=0x4095 subdriver=krauler"	# https://github.com/networkupstools/nut/issues/981
 "Kebo"	"ups"	"2"	"UPS-650VA"	"USB"	"megatec_usb"
 
 "KOLFF"	"ups"	"2"	"BLACK NOVA 1K/2K/3K/6K/10K/20K TOWER"	"USB"	"blazer_usb"
@@ -743,6 +750,8 @@
 "MasterPower"	"ups"	"3"	"MF-UPS650VA"	"USB"	"usbhid-ups"	# https://github.com/networkupstools/nut/issues/2661 - Note there are two VendorID:ProductID for KSTAR making this device
 
 "Maxxtro"	"ups"	"2"	"UPS 600 VA"	"serial port"	"blazer_ser"
+
+"Mean Well"	"ups"	"2"	"NTU Series"	""	"meanwell_ntu"
 
 "Mecer"	"ups"	"2"	"ME-1000-WTU"	"USB"	"nutdrv_qx"	# http://www.comx-computers.co.za/download/mecer/ME-1000-WTU.pdf
 "Mecer"	"ups"	"2"	"ME-2000"	""	"blazer_ser"
@@ -1199,6 +1208,11 @@
 "PowerTech"	"ups"	"1"	"Comp1000"	"DTR cable power"	"genericups upstype=3"
 "PowerTech"	"ups"	"2"	"SMK-800"	""	"blazer_ser"
 
+"Powervar"	"ups"	"5"	"GTS Series"	"USB"	"powervar-cu"
+"Powervar"	"ups"	"5"	"UPM Series"	"USB"	"powervar-cu"
+"Powervar"	"ups"	"5"	"UPM Series"	"Serial"	"powervar-cs"
+"Powervar"	"ups"	"5"	"UPM Series"	"USB"	"usbhid-ups"
+
 "PowerWalker"	"ups"	"2"	"Line-Interactive VI 1000"	""	"blazer_ser"
 "PowerWalker"	"ups"	"2"	"Line-Interactive VI 400/800"	""	"blazer_ser"
 "PowerWalker"	"ups"	"2"	"Line-Interactive VI 600"	""	"blazer_ser"
@@ -1321,6 +1335,7 @@
 
 "Salicru"	"ups"	"2"	"SPS ONE 700VA"	"USB"	"blazer_usb"
 "Salicru"	"ups"	"2"	"SPS ONE 900VA"	"USB"	"nutdrv_qx"	# https://github.com/networkupstools/nut/issues/1623
+"Salicru"	"ups"	"2"	"SPS 500 ONE"	"USB"	"nutdrv_qx (USB ID 0665:5161)"	# https://github.com/networkupstools/nut/issues/3079
 "Salicru"	"ups"	"2"	"SPS ONE 2000VA"	"USB"	"nutdrv_qx"	# https://www.salicru.com/en/ups/sps-one.html https://github.com/networkupstools/nut/issues/554
 "Salicru"	"ups"	"3"	"SPS 650/850 HOME"	"usb"	"usbhid-ups (experimental)"
 "Salicru"	"ups"	"3"	"SLC TWIN PRO2"	"usb"	"usbhid-ups (experimental)"	# https://github.com/networkupstools/nut/issues/450
@@ -1415,6 +1430,8 @@
 "Tecnoware"	"ups"	"2"	"UPS ERA LCD 0.65"	"USB"	"blazer_usb langid_fix=0x409"
 "Tecnoware"	"ups"	"2"	"UPS ERA PLUS 1100"	"USB"	"blazer_usb"	# https://www.tecnoware.com/Prodotti/FGCERAPL1100/ups-era-plus-1100.aspx https://github.com/networkupstools/nut/issues/747
 
+"Tescom"	"ups"	"2"	"LEO Plus LCD 1500A"	"USB"	"blazer_usb langid_fix=0x4095 subdriver=krauler"	# https://github.com/networkupstools/nut/issues/981
+
 "Texas Instruments"	"ups"	"5"	"INA219"	"hwmon"	"hwmon_ina219"
 
 "Tripp Lite"	"ups"	"1"	"(various)"	"Lan 2.2 interface - black 73-0844 cable"	"genericups upstype=5"
@@ -1508,6 +1525,7 @@
 "Tripp Lite"	"ups"	"2"	"SMART500RT1U"	"USB (older; product ID 0001, protocol 3005)"	"tripplite_usb"
 "Tripp Lite"	"ups"	"3"	"SMART500RT1U"	"USB (newer; protocol/product ID 3005)"	"usbhid-ups"	# http://www.tripplite.com/en/products/model.cfm?txtModelID=2853
 "Tripp Lite"	"ups"	"3"	"SMC15002URM"	"USB (protocol 3015)"	"usbhid-ups"	# https://www.tripplite.com/smartpro-120v-1-5kva-1kw-line-interactive-sine-wave-ups-2u-rack-tower-lcd-usb-db9-8-outlets~SMC15002URM
+"Tripp Lite"	"ups"	"2"	"SMX1200XLHG"	"USB (protocol 3017; USB ID: 09ae:0001)"	"tripplite_usb, may need upsid=65535"	# https://github.com/networkupstools/nut/issues/2258
 "Tripp Lite"	"ups"	"3"	"SMX1000LCD"	"USB (protocol 2005)"	"usbhid-ups"	# http://www.tripplite.com/en/products/model.cfm?txtModelID=3200
 "Tripp Lite"	"ups"	"3"	"SMX1000RT2U"	"USB (protocol 3015)"	"usbhid-ups"	# http://www.tripplite.com/en/products/model.cfm?txtModelID=2798
 "Tripp Lite"	"ups"	"3"	"SMX1050SLT"	"USB (protocol 3012)"	"usbhid-ups"	# http://www.tripplite.com/en/products/model.cfm?txtModelID=3249
@@ -1592,6 +1610,11 @@
 "Various"	"ups"	"2"	"Various Innova T"	"(USB ID 06da:0201)"	"blazer_ser or blazer_usb"
 "Various"	"ups"	"2"	"Various Innova RT"	"(USB ID 06da:0005)"	"blazer_ser or blazer_usb"
 "Various"	"ups"	"2"	"Various Innova 3/1 T"	"(USB ID 06da:0004)"	"blazer_ser or blazer_usb"
+"Various"	"ups"	"2"	"(Various USB)"	"(USB ID 0665:5161)"	"nutdrv_qx"
+"Various"	"ups"	"2"	"(Various USB)"	"Cypress Semiconductor USB to Serial (interface chip)"	"nutdrv_qx"
+"Various"	"ups"	"2"	"(Various USB)"	"INNO TECH USB to Serial (interface chip)"	"nutdrv_qx"
+"Various"	"ups"	"2"	"(Various USB)"	"Fry's Electronics MEC0003 (interface chip USB ID 0001:0000; may be accompanied by UPSmart software and use MEGA(USB) access mode there)"	"nutdrv_qx"	# Usually "no-name" UPS vendors that did not bother to register a real USB VID:PID
+"Various"	"ups"	"2"	"(Various USB)"	"ATCL FOR UPS (may be USB ID 0001:0000)"	"nutdrv_atcl_usb"	# Very rare, really; did not work for all devices even if they reported "ATCL FOR UPS" vendor/model strings
 
 "Victron/IMV"	"ups"	"1"	"(various)"	""	"victronups"
 "Victron/IMV"	"ups"	"1"	"Lite"	"crack cable"	"genericups upstype=10"
@@ -1616,7 +1639,7 @@
 "Voltronic Power"	"ups"	"2"	"Prosine 800"	"USB"	"nutdrv_qx"
 "Voltronic Power"	"ups"	"2"	"Vesta LED 850VA"	"USB"	"nutdrv_qx"
 "Voltronic Power"	"ups"	"2"	"(various)"	"Serial"	"nutdrv_qx"
-"Voltronic Power"	"ups"	"2"	"(various)"	"USB"	"nutdrv_qx"
+"Voltronic Power"	"ups"	"2"	"(various)"	"USB (especially ones with USB ID 0665:5161)"	"nutdrv_qx"
 
 "WinPower"	"ups"	"2"	"CPM-800"	""	"blazer_ser"
 
